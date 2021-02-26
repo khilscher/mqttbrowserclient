@@ -1,0 +1,92 @@
+<html>
+    <head>
+        <title>MQTT Browser Client</title>
+
+        <script src="paho-mqtt-min.js"></script>  
+        <script type = "text/javascript" language="javascript">
+
+            // Using https://github.com/eclipse/paho.mqtt.javascript
+            // Example from http://www.steves-internet-guide.com/using-javascript-mqtt-client-websockets/
+            // IoT Hub MQTT implementation details https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-mqtt-support
+
+            var client;
+            var host = "PnPIoTHub1001.azure-devices.net";
+            var port = 443;
+            var path = "/$iothub/websocket?iothub-no-client-cert=true";
+            var clientid = "sampleclient1";
+            var user = `${host}/${clientid}/?api-version=2018-06-30`;
+            var pwd = "SharedAccessSignature sr=PnPIoTHub1001.azure-devices.net%2Fdevices%2Fsampleclient1&sig=rcQXkKL%2FFhYmT1yV9rXZGxRhQNvC7o9R4fvmow6Viz4%3D&se=1644367442";
+
+            function MQTTconnect(){
+
+                document.getElementById("output").innerHTML += "<p>Connecting to IoT Hub...";
+
+                // Create a client instance
+                client = new Paho.MQTT.Client(host, port, path, clientid);
+
+                var options = {
+                    useSSL: true,
+                    timeout: 5,
+                    userName: user,
+                    password: pwd,
+                    mqttVersion: 4,
+                    onSuccess: onConnect,
+                };
+
+                // set callback handlers
+                client.onConnectionLost = onConnectionLost;
+                client.onMessageArrived = onMessageArrived;
+
+                // connect the client
+                client.connect(options);
+
+                document.getElementById("output").innerHTML += "<p>Connected.";
+
+            }
+
+            // called when the client connects
+            function onConnect() {
+
+                console.log("onConnect");
+
+                message = new Paho.MQTT.Message("Test message");
+                message.destinationName = `devices/${clientid}/messages/events/`;
+                client.send(message);
+                document.getElementById("output").innerHTML += "<p>Sent test message to IoT Hub.";
+
+                client.subscribe(`devices/${clientid}/messages/devicebound/#`);
+                document.getElementById("output").innerHTML += "<p>Listening for C2D messages...";
+
+                //client.subscribe("$iothub/methods/POST/#");
+                client.subscribe("$iothub/methods/POST/Reboot/#");
+                document.getElementById("output").innerHTML += "<p>Listening for Direct Method 'Reboot'...";
+
+            }
+
+            // called when the client loses its connection
+            function onConnectionLost(responseObject) {
+                if (responseObject.errorCode !== 0) {
+                    document.getElementById("output").innerHTML += "onConnectionLost:"+responseObject.errorMessage;
+                }
+            }
+
+            // called when a message arrives
+            function onMessageArrived(message) {
+                document.getElementById("output").innerHTML += "<p>Received Message: "+message.payloadString;
+            }
+
+        </script>
+        
+    </head>
+    <body>
+
+        <h1>MQTT Browser Client</h1>
+
+        <p id="output"></p>
+
+        <script>
+            MQTTconnect();
+        </script>
+
+    </body>
+</html>

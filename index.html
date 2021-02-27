@@ -10,12 +10,12 @@
             // IoT Hub MQTT implementation details https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-mqtt-support
 
             var client;
-            var host = "PnPIoTHub1001.azure-devices.net";
+            var host = "your_iot_hub_name.azure-devices.net";
             var port = 443;
             var path = "/$iothub/websocket?iothub-no-client-cert=true";
             var clientid = "sampleclient1";
             var user = `${host}/${clientid}/?api-version=2018-06-30`;
-            var pwd = "SharedAccessSignature sr=PnPIoTHub1001.azure-devices.net%2Fdevices%2Fsampleclient1&sig=rcQXkKL%2FFhYmT1yV9rXZGxRhQNvC7o9R4fvmow6Viz4%3D&se=1644367442";
+            var pwd = "SharedAccessSignature sr=...";
 
             function MQTTconnect(){
 

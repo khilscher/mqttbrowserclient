@@ -40,14 +40,12 @@
                 // connect the client
                 client.connect(options);
 
-                document.getElementById("output").innerHTML += "<p>Connected.";
-
             }
 
             // called when the client connects
             function onConnect() {
 
-                console.log("onConnect");
+                document.getElementById("output").innerHTML += "<p>Connected.";
 
                 message = new Paho.MQTT.Message("Test message");
                 message.destinationName = `devices/${clientid}/messages/events/`;
